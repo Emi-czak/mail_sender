@@ -1,0 +1,8 @@
+Dear $customer,
+
+we would like to remind you that the policy for $vehicle $model with number plate $car_numbers expires on $expirity_date.
+
+Please contact us for a new quote. 
+
+Regarts,
+$worker_fn $worker_sn
