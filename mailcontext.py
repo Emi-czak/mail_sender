@@ -1,8 +1,8 @@
+""" Mail handling context manager """
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 import ssl
-
 
 class MailContext:
     def __init__(self, smtp_server, port, ssl_enable=True):
@@ -20,11 +20,18 @@ class MailContext:
         return self
 
     def sendmail(self,sender, receiver, subject, message):
+        """_summary_
+
+        Args:
+            sender (str): sender mail
+            receiver (str): receiver mail
+            subject (str): mail subject
+            message (str): message text
+        """
         msg = MIMEMultipart()
         msg['From'] = sender
         msg['To'] = receiver
         msg['Subject'] = subject
-
         msg.attach(MIMEText(message, 'plain'))
 
         self.connection.send_message(msg)

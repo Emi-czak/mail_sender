@@ -1,3 +1,4 @@
+""" Database connectivity and mail handling """
 from collections import namedtuple
 from datetime import datetime, timedelta
 from os import getenv
@@ -11,13 +12,30 @@ Policy = namedtuple('Policy','firstname, surname, email, car_brand, \
             car_model, car_numbers, expirity_date')
 
 def read_template(filename):
+    """ Read message template from file
+
+    Args:
+        filename (str): path to txt file with message template
+
+    Returns:
+        string.Template: string with message template
+    """
     with open(filename, 'r', encoding='utf-8') as template_file:
         template_file_content = template_file.read()
     return Template(template_file_content)
 
-def select_nearly_expire(connection, days_to_expire = 30):
+def select_nearly_expire(database_connection, days_to_expire = 30):
+    """Select policies with nearly expire date.
+
+    Args:
+        database_connection: connection to database
+        days_to_expire (int): numbers of days to policy expiration
+
+    Returns:
+        list: list of policies with almost expire date
+    """
     policy_list = []
-    with DatabaseContext(connection) as database:
+    with DatabaseContext(database_connection) as database:
         database.cursor.execute("""SELECT
             customer_firstname,
             customer_surname,
@@ -42,11 +60,11 @@ if __name__ == '__main__':
     msg_template = read_template('message_temp.txt')
     sender = 'worker_mail@company.xo'
     connection = sqlite3.connect('insurance.db')
-    policy_list = select_nearly_expire(connection)
+    policies = select_nearly_expire(connection)
     mail_subject = 'Your policy is nearly expired.'
     with MailContext(smtp_server, port, ssl_enable) as connection:
         connection.connection.login(getenv('LOGIN'), getenv('PASSWORD'))
-        for policy in policy_list:
+        for policy in policies:
             message = msg_template.substitute(
                 customer = policy.firstname,
                 vehicle = policy.car_brand,
